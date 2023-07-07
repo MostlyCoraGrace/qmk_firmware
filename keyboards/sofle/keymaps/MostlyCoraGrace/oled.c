@@ -15,6 +15,9 @@
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
 
+
+#include "layernames.h"
+
 //Sets up what the OLED screens display.
 
 #ifdef OLED_ENABLE
@@ -30,40 +33,64 @@ static void render_logo(void) {
 }
 
 static void print_status_narrow(void) {
-    // Print current mode
-    oled_write_P(PSTR("\n\n"), false);
+    //print aesthetic bar
+    oled_write_P(PSTR("     "), TRUE);
+    oled_write_P(PSTR("\n"), false);
 
-    switch (get_highest_layer(layer_state)) {
-        case 0:
-            oled_write_ln_P(PSTR("Qwrt"), false);
+    // Print current mode
+    switch (get_highest_layer(layer_state | default_layer_state)) {
+        case _QW:
+            oled_write_P(PSTR("QWRTY"), false);
             break;
-        case 1:
-            oled_write_ln_P(PSTR("Clmk"), false);
+        case _QL:
+            oled_write_P(PSTR("QWRTY"), false);
+            break;
+        case _QR:
+            oled_write_P(PSTR("QWRTY"), false);
+            break;
+        case _GA:
+            oled_write_P(PSTR("GAME\n"), false);
+            break;
+        case _GL:
+            oled_write_P(PSTR("GAME\n"), false);
             break;
         default:
-            oled_write_P(PSTR("Mod\n"), false);
+            oled_write_P(PSTR("Undef"), false);
             break;
     }
-    oled_write_P(PSTR("\n\n"), false);
+
     // Print current layer
-    oled_write_ln_P(PSTR("LAYER"), false);
-    switch (get_highest_layer(layer_state)) {
-        case 0:
-        case 1:
+    switch (get_highest_layer(layer_state | default_layer_state)) {
+        case _QW:
             oled_write_P(PSTR("Base\n"), false);
             break;
-        case 2:
+        case _QL:
+            oled_write_P(PSTR("Lower"), false);
+            break;
+        case _QR:
             oled_write_P(PSTR("Raise"), false);
             break;
-        case 3:
+        case _GA:
+            oled_write_P(PSTR("Base\n"), false);
+            break;
+        case _GL:
             oled_write_P(PSTR("Lower"), false);
             break;
         default:
-            oled_write_ln_P(PSTR("Undef"), false);
+            oled_write_P(PSTR("Undef"), false);
     }
+
+    //print aesthetic bar
+    oled_write_P(PSTR("\n"), false);
+    oled_write_P(PSTR("     "), TRUE);
+    oled_write_P(PSTR("\n"), false);
+
+    //print current caps state, etc
     oled_write_P(PSTR("\n\n"), false);
     led_t led_usb_state = host_keyboard_led_state();
+    oled_write_ln_P(PSTR("NUMLK"), led_usb_state.num_lock);
     oled_write_ln_P(PSTR("CPSLK"), led_usb_state.caps_lock);
+    oled_write_ln_P(PSTR("SCRLK"), led_usb_state.scroll_lock);
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
